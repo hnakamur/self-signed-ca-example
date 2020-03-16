@@ -1,0 +1,64 @@
+[default]
+name                    = example-self-signed-ca
+domain_suffix           = saml.example.com
+name_opt                = utf8,multiline
+
+[ca_dn]
+countryName             = "JP"
+stateOrProvinceName     = "Osaka"
+localityName            = "Osaka City"
+organizationName        = "Example self-signed CA organization"
+commonName              = "Example self-signed CA"
+
+[ca]
+default_ca              = ca_default
+
+[ca_default]
+home                    = .
+serial                  = $home/db/serial
+database                = $home/db/index.txt
+new_certs_dir           = $home/certs
+certificate             = $home/$name.crt
+private_key             = $home/private/$name.key
+default_md              = sha256
+unique_subject          = no
+copy_extensions         = copy
+default_days            = 366
+policy                  = policy_c_o_match
+
+[policy_c_o_match]
+countryName             = match
+stateOrProvinceName     = optional
+organizationName        = match
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[req]
+default_bits            = 2048
+encrypt_key             = yes
+default_md              = sha256
+utf8                    = yes
+string_mask             = utf8only
+prompt                  = no
+distinguished_name      = ca_dn
+req_extensions          = ca_ext
+
+[ca_ext]
+basicConstraints        = critical,CA:true
+keyUsage                = critical,keyCertSign,cRLSign
+subjectKeyIdentifier    = hash
+
+[server_ext]
+authorityKeyIdentifier  = keyid:always
+basicConstraints        = critical,CA:false
+extendedKeyUsage        = clientAuth,serverAuth
+keyUsage                = critical,digitalSignature,keyEncipherment
+subjectKeyIdentifier    = hash
+
+[client_ext]
+authorityKeyIdentifier  = keyid:always
+basicConstraints        = critical,CA:false
+extendedKeyUsage        = clientAuth
+keyUsage                = critical,digitalSignature
+subjectKeyIdentifier    = hash
